@@ -1,0 +1,64 @@
+<!doctype html><html lang="tg"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#1d1612"><title>TFC Курьер</title>
+<style>
+:root{--bg:#faf9f6;--c:#fff;--t:#1d1612;--m:#85796f;--p:#ff2d1a;--b:#ece5dc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121010;--c:#1d1917;--t:#f4ece6;--m:#a39489;--b:#2c2522}}
+:root[data-theme="dark"]{--bg:#121010;--c:#1d1917;--t:#f4ece6;--m:#a39489;--b:#2c2522}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--t);font:16px system-ui,sans-serif}
+#w{max-width:560px;margin:0 auto;padding:12px}
+button,input,a.b{font:inherit;color:var(--t);background:var(--c);border:1px solid var(--b);border-radius:14px;padding:12px 14px;text-decoration:none;display:inline-block}
+input{width:100%;box-sizing:border-box;margin:5px 0}
+.pb{background:linear-gradient(135deg,#ff2d1a,#ff5a2c);color:#fff;border:0;font-weight:700}
+.cd{background:var(--c);border-radius:22px;padding:14px;margin:10px 0;box-shadow:0 8px 24px #1d16120f}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0}
+.nv{display:flex;gap:8px;margin:10px 0}.on{background:var(--p);color:#fff;border:0}
+small{color:var(--m)}.gr{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+</style></head><body><div id="w"><div id="app">Бор мешавад…</div></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,collection,doc,getDoc,updateDoc,runTransaction,onSnapshot,query,where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const app=initializeApp({
+ apiKey:"AIzaSyAVHyZgnmzcIU6j-XjcAa6fC4tvioscRqk",
+ authDomain:"fast-food-fe9ab.firebaseapp.com",
+ projectId:"fast-food-fe9ab",
+ storageBucket:"fast-food-fe9ab.firebasestorage.app",
+ messagingSenderId:"769329495086",
+ appId:"1:769329495086:web:8f3b416253d55b972e73bf"});
+const db=getFirestore(app,'default'),au=getAuth(app);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let U=null,ME=null,W=[],M=[],tab='w',un=[];
+const rows=s=>s.docs.map(d=>({...d.data(),id:d.id}));
+function card(o){
+ const gps=/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/.exec(o.a||'');
+ const dest=gps?gps[1]+','+gps[2]:(o.a||'');
+ const tot=o.it.reduce((a,i)=>a+i.p*i.q,0);
+ const g='https://www.google.com/maps/dir/?api=1&travelmode=driving&destination='+encodeURIComponent(dest);
+ const y=gps?'https://yandex.com/maps/?rtext=~'+gps[1]+','+gps[2]+'&rtt=auto':'https://yandex.com/maps/?text='+encodeURIComponent(dest);
+ const mine=o.cu==U.uid;
+ return `<div class="cd"><b>📄 Накладной #${o.id.slice(-4)}</b> <small>${new Date(o.ts).toLocaleTimeString().slice(0,5)}</small>
+ <div class="r"><span>👤 ${esc(o.nm||'—')}</span>${mine?`<a class="b" href="tel:${esc(o.ph)}">📞 ${esc(o.ph)}</a>`:''}</div>
+ <div>📍 ${esc(o.a||'')}${gps?' <small>(GPS)</small>':''}</div><hr>
+ ${o.it.map(i=>`<div class="r"><span>${esc(i.n)} × ${i.q}${i.c?'<br><small>💬 '+esc(i.c)+'</small>':''}</span><b>${i.p*i.q}</b></div>`).join('')}
+ <div class="r"><b>Ҷамъ: ${tot} сомонӣ</b><span>${o.pay=='card'?'💳 Пардохт шудааст':'💵 Нақд гиред'}</span></div>
+ <div class="gr">${!mine?`<button class="pb" onclick="Ac('${o.id}')">✅ Қабул кардан</button>`:o.cs=='taken'?`<a class="b pb" href="${g}" target="_blank" rel="noopener">🗺 Роҳ (Google)</a><a class="b" href="${y}" target="_blank" rel="noopener">🗺 Yandex</a><button class="pb" onclick="Dn('${o.id}')">📦 Расонида шуд</button>`:'<b>✅ Расонида шуд</b>'}</div></div>`}
+function R(){const a=$('#app');
+ if(!U){a.innerHTML=`<div class="cd"><h2>🛵 TFC Курьер</h2><input id="lp" type="tel" placeholder="Телефон"><input id="lw" type="password" placeholder="Парол"><button class="pb" onclick="Lg()">Ворид шудан</button></div>`;return}
+ if(!ME){a.innerHTML='<div class="cd">Ин ҳисоб курьер нест ё бор мешавад… <button onclick="Out()">Баромадан</button></div>';return}
+ const L=tab=='w'?W:M.filter(o=>o.cs=='taken'||(o.cs=='done'&&Date.now()-o.cd<864e5));
+ a.innerHTML=`<div class="r"><b>🛵 ${esc(ME.n)}</b><button onclick="Out()">⎋</button></div><div class="nv"><button class="${tab=='w'?'on':''}" onclick="tab='w';R()">Нав (${W.length})</button><button class="${tab=='m'?'on':''}" onclick="tab='m';R()">Фармоишҳои ман</button></div>`+(L.length?L.slice().sort((x,y)=>y.ts-x.ts).map(card).join(''):'<p>Ҳоло фармоиш нест.</p>');
+}
+window.R=R;window.tab=tab;
+window.Lg=()=>signInWithEmailAndPassword(au,$('#lp').value.replace(/\D/g,'')+'@courier.tfc',$('#lw').value).catch(()=>alert('Телефон ё парол нодуруст аст'));
+window.Out=()=>signOut(au);
+window.Ac=id=>runTransaction(db,async t=>{const r=doc(db,'orders',id),s=await t.get(r);if(s.data().cs!='wait')throw new Error('taken');t.update(r,{cs:'taken',cu:U.uid,cn:ME.n,cp:ME.ph,ct:Date.now()})}).then(()=>{tab='m';R()}).catch(()=>alert('Ин фармоишро курьери дигар гирифт'));
+window.Dn=id=>updateDoc(doc(db,'orders',id),{cs:'done',cd:Date.now()}).catch(e=>alert('Хато: '+e.code));
+Object.defineProperty(window,'tab',{get:()=>tab,set:v=>{tab=v}});
+onAuthStateChanged(au,async u=>{U=u;un.forEach(f=>f());un=[];ME=null;W=[];M=[];R();if(!u)return;
+ try{const c=await getDoc(doc(db,'couriers',u.uid));if(!c.exists()){$('#app').innerHTML='<div class="cd">Ин ҳисоб курьер нест. <button onclick="Out()">Баромадан</button></div>';return}ME={...c.data(),id:u.uid}}catch(e){return}
+ un.push(onSnapshot(query(collection(db,'orders'),where('cs','==','wait')),s=>{W=rows(s);R()}));
+ un.push(onSnapshot(query(collection(db,'orders'),where('cu','==',u.uid)),s=>{M=rows(s);R()}));
+ R()});
+</script></body></html>

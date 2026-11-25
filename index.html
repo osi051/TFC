@@ -168,6 +168,11 @@ function INS(){
 function DI(){if(IP){IP.prompt();IP.userChoice.then(()=>{IP=null;R()});return}
  T(IOS?'Safari: тугмаи «Share» ⬆️ → «Add to Home Screen» (Ба экрани асосӣ)':'Браузер: меню ⋮ → «Add to Home screen» / «Насб кардани барнома»',8000)}
 function XI(){try{localStorage.setItem('instx',Date.now())}catch(e){}R()}
+const NTC='tfc-cur-142869bad73f0b3d';
+function NC(o,id){try{fetch('https://ntfy.sh',{method:'POST',body:JSON.stringify({topic:NTC,title:'🛵 Фармоиши нав барои расонидан #'+id.slice(-4),message:o.it.length+' намуд · '+o.it.reduce((a,i)=>a+i.p*i.q,0)+' сомонӣ',priority:4,tags:['motor_scooter'],click:new URL('courier.html',location.href).href})}).catch(()=>{})}catch(e){}}
+const CL=o=>o.cs=='wait'?'<br><small>🛵 Курьер интизор аст…</small>':o.cs=='taken'?'<br><small>🛵 '+esc(o.cn||'')+' қабул кард</small>':o.cs=='done'?'<br><small>✅ Курьер расонд</small>':'';
+function AK(){return `<div class="cd"><b>Курьерҳо</b>${(S.k||[]).map(k=>`<div class="r"><span>${esc(k.n)} · ${esc(k.ph)}</span><button onclick="if(confirm('Нест кунем?'))DB.delCourier('${k.id}')">🗑</button></div>`).join('')}<input id="kn" placeholder="Ном"><input id="kp" type="tel" placeholder="Телефон (логин)"><input id="kw" type="password" placeholder="Парол (камаш 6 ҳарф)"><button class="pb" onclick="KA()">Илова кардан</button></div>`}
+function KA(){const n=$('#kn').value.trim(),p=$('#kp').value.replace(/\D/g,''),w=$('#kw').value;if(!n||p.length<7||w.length<6)return alert('Ном, телефон (7+ рақам) ва парол (6+ ҳарф) нависед');DB.addCourier(n,p,w).then(()=>{T('✅ Курьер илова шуд');R()}).catch(e=>alert('Хато: '+(e.code||e.message)))}
 function T(t,ms){const e=document.createElement('div');e.className='ts';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),ms||1600)}
 let ld=0;function Bp(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator();o.connect(c.destination);o.frequency.value=880;o.start();setTimeout(()=>{o.stop();c.close()},350)}catch(e){}}
 window.onhashchange=()=>{v=location.hash=='#admin'?'a':'c';MF();R()};
@@ -197,7 +202,7 @@ function ban(o){
  if(o.st=='new')return `⏳ Фармоиши ${sid(o)} интизори тасдиқ аст.`;
  if(o.st=='rej')return '🚫 Бубахшед, фармоиши '+sid(o)+' рад шуд.'+(o.rs?' Сабаб: '+esc(o.rs):'');
  if(o.st=='ok')return `🟡 Қабул шуд: ${L}.<br>Таёр шуда истодааст: ${o.m} дақиқа.`;
- if(o.st=='sent')return `📦 Фармоиши ${sid(o)} таёр шуд ва фиристода шуд!`;
+ if(o.st=='sent')return `📦 Фармоиши ${sid(o)} таёр шуд ва фиристода шуд!`+(o.cn?'<br>🛵 Курьер: '+esc(o.cn)+(o.cp?' · <a href="tel:'+esc(o.cp)+'">'+esc(o.cp)+'</a>':''):o.cs=='wait'?'<br>🛵 Курьер меҷӯем…':'');
  return '🎉 Ташаккур! Фармоиш анҷом ёфт.';
 }
 function C(){
@@ -280,7 +285,7 @@ function VA(id){const n=$('#vn'+id).value.trim(),p=+$('#vp'+id).value;if(!n||!p)
 function VD(id,j){DB.set('menu',id,{v:(dd(id).v||[]).filter((_,x)=>x!=j)})}
 const ED=d=>{const i=(k,p,t)=>`<label><small>${p}</small><input ${t?'type="number"':''} value="${esc(d[k]||'')}" onchange="DB.set('menu','${d.id}',{${k}:${t?'+this.value':'this.value'}})"></label>`;return i('n','Ном')+i('r','Рецепт / таркиб')+i('t','Дақиқа',1)+i('o','Нархи пештара (аксия, 0 = нест)',1)+VE(d)};
 const GS=(v,fn,id)=>`<select ${id?'id="'+id+'"':''} onchange="${fn}"><option value="">Гурӯҳ</option>${(S.c.cats||[]).map(x=>`<option value="${x.id}" ${x.id==v?'selected':''}>${esc(x.n)}</option>`).join('')}</select>`;
-function St(id,s){const u={st:s};if(s=='sent')u.sa=Date.now();if(s=='paid'){u.pt=Date.now();T('✅ Ба архив гузашт')}DB.set('orders',id,u)}
+function St(id,s){const u={st:s};if(s=='sent'){u.sa=Date.now();const o=S.o.find(x=>x.id==id);if(o&&o.ty=='del'){u.cs='wait';NC(o,id)}}if(s=='paid'){u.pt=Date.now();T('✅ Ба архив гузашт')}DB.set('orders',id,u)}
 function Sh(u,mx,q){return new Promise(r=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,mx/Math.max(im.width,im.height));c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',q))};im.onerror=()=>r(u);im.src=u})}
 async function Opt(){T('Хурд карда истодааст…',3000);let n=0;
  for(const d of S.d)if(d.i&&d.i.length>25000){const u=await Sh(d.i,300,.62);if(u.length<d.i.length){await DB.set('menu',d.id,{i:u});n++}}
@@ -297,7 +302,7 @@ function AS(){const c=S.c,i=(k,p)=>`<input placeholder="${p}" value="${esc(c[k]|
  return `<div class="cd"><b>Тамос</b>${i('ig','Instagram линк (https://...)')}${i('ph','Рақами телефон')}${i('ad','Суроға')}${i('ml','Линки харита (Google Maps)')}</div><div class="cd"><b>Сабук кардани сайт</b><br><small>Аксҳои калони пештараро хурд мекунад (як бор пахш кунед)</small><br><button class="pb" onclick="Opt()">🗜 Хурд кардани аксҳо</button></div>`}
 function A(){
  if(!AU)return `<div class="cd"><b>Воридшавии админ</b><input id="le" type="email" placeholder="Почта"><input id="lp" type="password" placeholder="Парол"><button class="pb" onclick="Lg()">Ворид шудан</button></div>`;
- let h=`<div class="nv"><button class="${tab=='o'?'on':''}" onclick="tab='o';R()">Фармоишҳо${OL().filter(o=>o.st=='new').length?' 🔴'+OL().filter(o=>o.st=='new').length:''}</button><button class="${tab=='m'?'on':''}" onclick="tab='m';R()">Меню</button><button class="${tab=='ar'?'on':''}" onclick="tab='ar';R()">Архив</button><button class="${tab=='c'?'on':''}" onclick="tab='c';R()">Гурӯҳ/Баннер</button><button class="${tab=='s'?'on':''}" onclick="tab='s';R()">Тамос</button><button onclick="DB.logout()">⎋</button></div>`;
+ let h=`<div class="nv"><button class="${tab=='o'?'on':''}" onclick="tab='o';R()">Фармоишҳо${OL().filter(o=>o.st=='new').length?' 🔴'+OL().filter(o=>o.st=='new').length:''}</button><button class="${tab=='m'?'on':''}" onclick="tab='m';R()">Меню</button><button class="${tab=='ar'?'on':''}" onclick="tab='ar';R()">Архив</button><button class="${tab=='k'?'on':''}" onclick="tab='k';R()">Курьерҳо</button><button class="${tab=='c'?'on':''}" onclick="tab='c';R()">Гурӯҳ/Баннер</button><button class="${tab=='s'?'on':''}" onclick="tab='s';R()">Тамос</button><button onclick="DB.logout()">⎋</button></div>`;
  if(tab=='o'||tab=='ar'){const L=tab=='o'?OL():OR();
   if(!L.length)h+='<p>Фармоиш ҳоло нест.</p>';
   h+=L.slice().reverse().map(o=>`<div class="cd ${(o.st=='paid'||o.st=='done')?'ok':(o.st=='no'||o.st=='rej')?'bad':o.st=='new'?'nw':o.st=='ok'?'yl':o.st=='sent'?'bl':''}"><b>${sid(o)}</b> · ${new Date(o.ts).toLocaleTimeString().slice(0,5)} · ${esc(o.nm||'')} ${esc(o.ph)} · ${o.ty=='del'?'Доставка: '+esc(o.a):'Дар ҷой'} · ${o.pay=='card'?'Корт':'Нақд'}
@@ -305,9 +310,9 @@ function A(){
   <div class="r"><b>Ҷамъ: ${o.it.reduce((a,i)=>a+i.p*i.q,0)} сомонӣ</b></div>
   ${o.ck?`<small>🧾 Чеки пардохт:</small><img class="im rc" src="${o.ck}" alt="">`:''}
   ${o.st=='new'?`<input id="m${o.id}" type="number" placeholder="Чанд дақиқа омода мешавад?"><button class="pb" onclick="Ac('${o.id}')">Қабул ва паём ба мизоҷ</button> <button onclick="Rj('${o.id}')">🚫 Рад кардан</button>`
-  :o.st=='ok'?`<b>🟡 Таёр шуда истодааст</b> · ${o.m} дақ.<br><button class="pb" onclick="St('${o.id}','sent')">📦 Ирсол</button>`:o.st=='sent'?`<b>🔵 Фиристода шуд</b><br><button class="pb" onclick="St('${o.id}','paid')">💰 Расчот</button>`:o.st=='paid'?'<b>✅ Расчот шуд</b>'
+  :o.st=='ok'?`<b>🟡 Таёр шуда истодааст</b> · ${o.m} дақ.<br><button class="pb" onclick="St('${o.id}','sent')">📦 Ирсол</button>`:o.st=='sent'?`<b>🔵 Фиристода шуд</b>${CL(o)}<br><button class="pb" onclick="St('${o.id}','paid')">💰 Расчот</button>`:o.st=='paid'?'<b>✅ Расчот шуд</b>'
   :o.st=='done'?'<b>✅ Муваффақ</b>':o.st=='rej'?'<b>🚫 Рад шуд</b>'+(o.rs?' · '+esc(o.rs):''):'<b>❌ Мизоҷ нагирифт</b>'}</div>`).join('');
- }else if(tab=='c'){h+=AC()}else if(tab=='s'){h+=AS()}else{
+ }else if(tab=='k'){h+=AK()}else if(tab=='c'){h+=AC()}else if(tab=='s'){h+=AS()}else{
   h+=S.d.map(d=>`<div class="cd"><div class="r"><span>${d.i?`<img class="th" src="${d.i}" alt="">`:''}<b>${esc(d.n)}</b></span><span><button onclick="ed=ed=='${d.id}'?'':'${d.id}';R()">✏️</button> <button onclick="pid='${d.id}';$('#fi').click()">📷</button> <button onclick="if(confirm('Нест кунем?'))DB.del('menu','${d.id}')">🗑</button></span></div>
   <div class="r"><label><small>Нарх</small><input type="number" value="${d.p}" onchange="DB.set('menu','${d.id}',{p:+this.value})"></label><label><small>Мондаи анбор (дона)</small><input type="number" value="${d.k}" onchange="DB.set('menu','${d.id}',{k:+this.value})"></label></div>${GS(d.g,"DB.set('menu','"+d.id+"',{g:this.value})")}${ed==d.id?ED(d):''}</div>`).join('')
   +`<div class="cd"><b>Маълумоти пардохт (рақами корт)</b><input placeholder="Рақами корт ва ном" value="${esc(S.pay||'')}" onchange="DB.set('cfg','main',{pay:this.value})"></div><div class="cd"><b>Таоми нав / комбо / аксия</b><input id="an" placeholder="Ном (масалан: Комбо: бургер + фри)"><input id="ap" type="number" placeholder="Нарх"><input id="ao" type="number" placeholder="Нархи пештара (барои аксия)"><input id="at" type="number" placeholder="Дақиқа"><input id="ak" type="number" placeholder="Чанд дона дорем?"><input id="ar" placeholder="Рецепт / таркиб">${GS('','','ag')}<button onclick="pid='';$('#fi').click()">📷 Акс интихоб кунед ${nph?'✓':''}</button> <button class="pb" onclick="Add()">Илова кардан</button></div>`;
@@ -319,7 +324,7 @@ function init(){
  DB.cfg(c=>{S.c=c;S.pay=c.pay||'';if(v=='c'?st==0:true)R();Hs(2)});
  let id='';try{id=localStorage.getItem('last')}catch(e){}
  if(id)uo=DB.order(id,o=>{NT(o);LO=o;if(st==0&&v=='c')R()});
- DB.auth(u=>{AU=u;if(u&&!ao){ao=1;DB.purge().catch(()=>{});DB.orders(a=>{const n0=S.o.filter(o=>o.st=='new').length,fs=!ld;ld=1;S.o=a;if(!fs&&a.filter(o=>o.st=='new').length>n0)Bp();R()})}R()});
+ DB.auth(u=>{AU=u;if(u&&!ao){ao=1;DB.purge().catch(()=>{});DB.couriers(a=>{S.k=a;if(v=='a')R()});DB.orders(a=>{const n0=S.o.filter(o=>o.st=='new').length,fs=!ld;ld=1;S.o=a;if(!fs&&a.filter(o=>o.st=='new').length>n0)Bp();R()})}R()});
 }
 window.addEventListener('dbready',init);
 setInterval(()=>{if(v=='c'&&st==0&&!det&&LO&&LO.st=='ok'&&Date.now()>=due(LO))R()},20000);
@@ -328,13 +333,13 @@ R();
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,setDoc,deleteDoc,writeBatch,increment,query,orderBy,getDoc,getDocs,where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const app=initializeApp({
+const CFG={
  apiKey:"AIzaSyAVHyZgnmzcIU6j-XjcAa6fC4tvioscRqk",
  authDomain:"fast-food-fe9ab.firebaseapp.com",
  projectId:"fast-food-fe9ab",
  storageBucket:"fast-food-fe9ab.firebasestorage.app",
  messagingSenderId:"769329495086",
- appId:"1:769329495086:web:8f3b416253d55b972e73bf"});
+ appId:"1:769329495086:web:8f3b416253d55b972e73bf"};const app=initializeApp(CFG);
 let db;try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})},'default')}catch(e){db=getFirestore(app,'default')}
 let AUTH=null;const A_=()=>AUTH||(AUTH=import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(m=>({m,au:m.getAuth(app)})));
 const list=s=>s.docs.map(d=>({...d.data(),id:d.id}));
@@ -352,6 +357,9 @@ window.DB={
   b.update(doc(db,'orders',o.id),{st:'ok',m,at:Date.now()});return b.commit()},
  get:id=>getDoc(doc(db,'orders',id)).then(s=>s.exists()?{...s.data(),id:s.id}:null),
  purge:async()=>{const s=await getDocs(query(collection(db,'orders'),where('ts','<',Date.now()-30*864e5)));const b=writeBatch(db);s.docs.forEach(d=>b.delete(d.ref));if(s.size)await b.commit()},
+ couriers:cb=>onSnapshot(collection(db,'couriers'),s=>cb(list(s)),()=>{}),
+ delCourier:id=>deleteDoc(doc(db,'couriers',id)),
+ addCourier:async(n,p,w)=>{const m=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');const a2=initializeApp(CFG,'sec'+Date.now());const u2=m.getAuth(a2);const c=await m.createUserWithEmailAndPassword(u2,p+'@courier.tfc',w);await setDoc(doc(db,'couriers',c.user.uid),{n,ph:p,ts:Date.now()});await m.signOut(u2)},
  login:(e,p)=>A_().then(x=>x.m.signInWithEmailAndPassword(x.au,e,p)),
  logout:()=>A_().then(x=>x.m.signOut(x.au)),
  auth:cb=>{(location.hash=='#admin'?A_():new Promise(r=>setTimeout(r,3000)).then(A_)).then(x=>x.m.onAuthStateChanged(x.au,cb))}};
