@@ -1,0 +1,25 @@
+{
+ "id": "/admin",
+ "name": "TFC Админ",
+ "short_name": "TFC Админ",
+ "start_url": "./#admin",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#1d1612",
+ "theme_color": "#1d1612",
+ "lang": "tg",
+ "icons": [
+  {
+   "src": "icon-a192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-a512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
