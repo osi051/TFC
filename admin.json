@@ -2,7 +2,7 @@
  "id": "/admin",
  "name": "TFC Админ",
  "short_name": "TFC Админ",
- "start_url": "./#admin",
+ "start_url": "admin.html",
  "scope": "./",
  "display": "standalone",
  "background_color": "#1d1612",
